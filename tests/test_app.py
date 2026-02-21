@@ -1,29 +1,25 @@
 import copy
 
+# we import the module containing the FastAPI app and the activity state
+import src.app as api
+
+# client will be created after importing
+from fastapi.testclient import TestClient
+
+client = TestClient(api.app)
+
 test_data_backup = None
 
 
 def setup_module(module):
     """Save a pristine copy of the activity database before any tests run."""
-    from src import app as api
-
     global test_data_backup
     test_data_backup = copy.deepcopy(api.activities)
 
 
 def teardown_function(function):
     """Restore the activity database after each test (AAA: Arrange)."""
-    from src import app as api
-
     api.activities = copy.deepcopy(test_data_backup)
-
-
-from fastapi.testclient import TestClient
-
-from src import app as api
-
-# create a client once; state is reset between tests by teardown_function
-client = TestClient(api)
 
 
 def test_get_activities_returns_initial_data():
